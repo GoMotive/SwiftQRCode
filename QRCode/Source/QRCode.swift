@@ -1,7 +1,7 @@
 //
 //  QRCode.swift
 //  QRCode
-//
+//  Modified by Kiran Ruth R
 //  Created by 刘凡 on 15/5/15.
 //  Copyright (c) 2015年 joyios. All rights reserved.
 //
@@ -196,15 +196,14 @@ open class QRCode: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         dataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
     }
     
-    open func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputMetadataObjects metadataObjects: [Any]!, from connection: AVCaptureConnection!) {
-        
+    open func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         clearDrawLayer()
         
         for dataObject in metadataObjects {
             
             if let codeObject = dataObject as? AVMetadataMachineReadableCodeObject,
                 let obj = previewLayer.transformedMetadataObject(for: codeObject) as? AVMetadataMachineReadableCodeObject {
-
+                
                 if scanFrame.contains(obj.bounds) {
                     currentDetectedCount = currentDetectedCount + 1
                     if currentDetectedCount > maxDetectedCount {
@@ -223,7 +222,7 @@ open class QRCode: NSObject, AVCaptureMetadataOutputObjectsDelegate {
             }
         }
     }
-    
+        
     open func removeAllLayers() {
         previewLayer.removeFromSuperlayer()
         drawLayer.removeFromSuperlayer()
@@ -256,13 +255,12 @@ open class QRCode: NSObject, AVCaptureMetadataOutputObjectsDelegate {
     func createPath(_ points: NSArray) -> UIBezierPath {
         let path = UIBezierPath()
 
-        var point = CGPoint(dictionaryRepresentation: points[0] as! CFDictionary)
-        path.move(to: point!)
+        var point = points[0] as! CGPoint
         
         var index = 1
         while index < points.count {
-            point = CGPoint(dictionaryRepresentation: points[index] as! CFDictionary)
-            path.addLine(to: point!)
+            point = points[index] as! CGPoint
+            path.addLine(to: point)
             
             index = index + 1
         }
@@ -284,7 +282,9 @@ open class QRCode: NSObject, AVCaptureMetadataOutputObjectsDelegate {
     lazy var session = AVCaptureSession()
     /// input
     lazy var videoInput: AVCaptureDeviceInput? = {
-
+        
+        
+        
         if let device = AVCaptureDevice.default(for: AVMediaType.video) {
             return try? AVCaptureDeviceInput(device: device)
         }
